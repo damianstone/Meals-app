@@ -1,18 +1,33 @@
 import React from "react";
-import { CATEGORIES, MEALS } from "../data/dummy-data";
+import { View, StyleSheet } from "react-native";
+import DefaultText from "../components/DefaultText";
+import { CATEGORIES } from "../data/dummy-data";
 import MealList from "../components/MealList";
+import { useSelector } from "react-redux";
 
 const CategoryMealScreen = (props) => {
+
   //PASAR PARAMS
   const catId = props.navigation.getParam("categoryId");
   //SELECTEDCATEGORY ahora funciona como el item intero por lo que puedo extraer lo demas como el title
-  //const selectedCategory = CATEGORIES.find((cat) => cat.id === catId);
 
-  const displayedMeals = MEALS.filter(
+  // TRAER LOS MEALS
+  const availableMeals = useSelector((state) => state.meals.filteredMeals);
+  const displayedMeals = availableMeals.filter(
     (meal) => meal.categoryIds.indexOf(catId) >= 0
   );
 
+  // SI NO HAY MEALS
+  if (displayedMeals.length === 0) {
+    return (
+      <View style={styles.content}>
+        <DefaultText>No meals found, maybe check your filters?</DefaultText>
+      </View>
+    );
+  }
+
   return <MealList listData={displayedMeals} navigation={props.navigation} />;
+
 };
 
 // en las opciones necesito algo de las props, como en este caso con los params,
@@ -28,23 +43,10 @@ CategoryMealScreen.navigationOptions = (navigationData) => {
 
 export default CategoryMealScreen;
 
-/*
-
-      <Text>The category meal screen</Text>
-      <Text>{selectedCategory.title}</Text>
-      <Button
-        title="Go to Details"
-        onPress={() => {
-          props.navigation.navigate({
-            routeName: "MealDetail",
-          });
-        }}
-      />
-      <Button
-        title="Go Back"
-        onPress={() => {
-          props.navigation.goBack();
-        }}
-      />
-
-*/
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
